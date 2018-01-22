@@ -15,14 +15,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var cookieSession = require('cookie-session');
 
 app.use(cookieSession({
-  name: 'session',
-  keys: ['asdf1234567890qwer']
+    name: 'session',
+    keys: ['asdf1234567890qwer']
 }));
 
 app.use((req, res, next) => {
-  res.locals.session = req.session;
-  res.locals.currentUser = req.session.currentUser;
-  next();
+    res.locals.session = req.session;
+    res.locals.currentUser = req.session.currentUser;
+    next();
 });
 
 
@@ -34,8 +34,8 @@ const getPostSupport = require('express-method-override-get-post-support');
  
  
 app.use(methodOverride(
-  getPostSupport.callback,
-  getPostSupport.options // { methods: ['POST', 'GET'] } 
+    getPostSupport.callback,
+    getPostSupport.options // { methods: ['POST', 'GET'] } 
 ));
 
 
@@ -43,8 +43,8 @@ app.use(methodOverride(
 // Referrer
 // ----------------------------------------
 app.use((req, res, next) => {
-  req.session.backUrl = req.header('Referer') || '/';
-  next();
+    req.session.backUrl = req.header('Referer') || '/';
+    next();
 });
 
 
@@ -66,21 +66,23 @@ app.use(morganToolkit());
 // ----------------------------------------
 // Mongoose
 // ----------------------------------------
-// const mongoose = require('mongoose');
-// app.use((req, res, next) => {
-//   if (mongoose.connection.readyState) {
-//     next();
-//   } else {
-//     require('./mongo')().then(() => next());
-//   }
-// });
+const mongoose = require('mongoose');
+app.use((req, res, next) => {
+      if (mongoose.connection.readyState) {
+    next();
+    } else {
+        require('./mongo')().then(() => next());
+    }
+});
 
 // ----------------------------------------
 // Routes
 // ----------------------------------------
-app.get('/', (req, res) => {
-    res.render('views/index');
-});
+var sessionsRouter = require('./routers/sessions')(app);
+app.use('/', sessionsRouter);
+
+var usersRouter = require('./routers/users');
+app.use('/users', usersRouter);
 
 
 // ----------------------------------------
@@ -90,8 +92,8 @@ var expressHandlebars = require('express-handlebars');
 
 
 var hbs = expressHandlebars.create({
-  partialsDir: 'views/',
-  defaultLayout: 'application'
+    partialsDir: 'views/',
+    defaultLayout: 'application'
 });
 
 
@@ -112,7 +114,7 @@ app.set('view engine', 'handlebars');
 // ----------------------------------------
 var port = process.env.PORT ||
   process.argv[2] ||
-  3000;
+  4000;
 var host = 'localhost';
 
 
